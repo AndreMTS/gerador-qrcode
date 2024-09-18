@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de QR Code Moderno</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/quasar@2.12.0/dist/quasar.prod.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./src/styles.css">
+    <style>
+        body {
+            background-attachment: fixed;
+        }
+        .qr-code-container {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .qr-code-container img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="q-app">
+        <q-layout view="hHh lpR fFf">
+            <q-page-container>
+                <q-page class="flex flex-center">
+                    <q-card style="width: 400px;">
+                        <q-card-section>
+                            <div class="text-h6" style="text-align: center;">GERADOR QR CODE</div>
+                        </q-card-section>
+
+                        <q-card-section>
+                            <q-input 
+                                v-model="url" 
+                                label="Digite o URL aqui" 
+                                outlined
+                                :rules="[val => isValidUrl(val) || 'Por favor, insira um URL válido']"
+                            >
+                                <template v-slot:append>
+                                    <q-btn @click="gerarQRCode" color="primary" icon="qr_code" round />
+                                </template>
+                            </q-input>
+                        </q-card-section>
+
+                        <q-card-section v-if="qrCodeUrl" class="flex flex-center">
+                            <div class="qr-code-container">
+                                <img :src="qrCodeUrl" alt="QR Code" @click="abrirModal" style="cursor: pointer;">
+                            </div>
+                        </q-card-section>
+                    </q-card>
+                </q-page>
+            </q-page-container>
+        </q-layout>
+
+        
+        <q-dialog v-model="modalAberto">
+            <q-card style="width: 450px; max-width: 90vw;">
+                <q-card-section>
+                    <div class="text-h6" style="text-align: center;">GERADOR QR CODE</div>
+                </q-card-section>
+
+                <q-card-section class="flex flex-center">
+                    <img :src="qrCodeUrl" alt="QR Code Ampliado" style="width: 400px; height: 400px;">
+                </q-card-section>
+            </q-card>
+        </q-dialog>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quasar@2.12.0/dist/quasar.umd.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    url: '',
+                    qrCodeUrl: '',
+                    modalAberto: false
+                }
+            },
+            methods: {
+                isValidUrl(url) {
+                    const regex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+                    return regex.test(url);
+                },
+                gerarQRCode() {
+                    if (this.url && this.isValidUrl(this.url)) {
+                        QRCode.toDataURL(this.url, {
+                            width: 400,
+                            height: 400
+                        }, (err, dataUrl) => {
+                            if (err) {
+                                Quasar.Notify.create({
+                                    type: 'negative',
+                                    message: 'Erro ao gerar QR Code'
+                                });
+                                return;
+                            }
+                            this.qrCodeUrl = dataUrl;
+                            Quasar.Notify.create({
+                                type: 'positive',
+                                message: 'QR Code gerado com sucesso!'
+                            });
+                        });
+                    } else {
+                        Quasar.Notify.create({
+                            type: 'negative',
+                            message: 'Por favor, insira um URL válido'
+                        });
+                        return;
+                    }
+                },
+                abrirModal() {
+                    this.modalAberto = true;
+                }
+            }
+        });
+
+        app.use(Quasar);
+        app.mount('#q-app');
+    </script>
+</body>
+</html>
