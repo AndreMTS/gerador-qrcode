@@ -18,7 +18,8 @@ Este projeto é um gerador de QR Code moderno e fácil de usar, desenvolvido com
 
 ## Demonstração
 
-[Link para uma demonstração ao vivo do projeto](https://andremts-gerador-qrcode.surge.sh/)
+ - [Link para uma demonstração Github Pages](https://andremts.github.io/gerador-qrcode/)
+ - [Link para uma demonstração Surge](https://andremts-gerador-qrcode.surge.sh/)
 
 ## Licença
 
